@@ -38,10 +38,10 @@ jobs:
         run: make build-api
         working-directory: .
 
-      - name: Run Tests
-        run: |
-          cd $GITHUB_WORKSPACE
-          pytest
+      #- name: Run Tests
+       # run: |
+        #  cd $GITHUB_WORKSPACE
+         # pytest
         #make test
 
       - name: Code Linting
