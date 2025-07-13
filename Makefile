@@ -2,7 +2,7 @@
 
 build-api:
 	@echo "Building REST API Docker image..."
-	docker build -t $(IMAGE_NAME):latest .
+	docker build -t dipakrasal2009/rest-api-webserver:latest .
 
 test:
 	@echo "Running tests with pytest..."
