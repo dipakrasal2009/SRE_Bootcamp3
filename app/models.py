@@ -1,14 +1,10 @@
-from app.db import get_db_connection
+from app import db
 
-def Student():
-    conn = get_db_connection()
-    conn.execute('''
-        CREATE TABLE IF NOT EXISTS students (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            age INTEGER,
-            email TEXT
-        )
-    ''')
-    conn.commit()
-    conn.close()
+class Student(db.Model):
+    __tablename__ = 'students'
+    __table_args__ = {'extend_existing': True}
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), nullable=False)
+    age = db.Column(db.Integer, nullable=False)
+    email = db.Column(db.String(120), nullable=False)  # ✅ Ensure this line exists
+

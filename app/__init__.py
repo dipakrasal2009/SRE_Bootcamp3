@@ -1,15 +1,17 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from .config import Config
-from app.db import db
-
-#db = SQLAlchemy()
+from .db import db
+from flask_migrate import Migrate
+from .models import db  # or wherever db is defined
 
 def create_app():
     app = Flask(__name__)
+
+
     app.config.from_object(Config)
 
     db.init_app(app)
+    migrate = Migrate(app, db)
 
     from .routes import student_bp
     app.register_blueprint(student_bp)

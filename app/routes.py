@@ -1,6 +1,5 @@
 from flask import Blueprint, request, jsonify
-from .models import Student
-from . import db
+from .db import Student, db
 
 student_bp = Blueprint('student_bp', __name__, url_prefix='/api/v1')
 
@@ -17,7 +16,7 @@ def get_student(id):
 @student_bp.route('/student', methods=['POST'])
 def add_student():
     data = request.get_json()
-    new_student = Student(name=data['name'], age=data['age'], grade=data['grade'])
+    new_student = Student(name=data['name'], age=data['age'], email=data['email'])
     db.session.add(new_student)
     db.session.commit()
     return jsonify(new_student.to_dict()), 201
@@ -28,7 +27,7 @@ def update_student(id):
     data = request.get_json()
     student.name = data['name']
     student.age = data['age']
-    student.grade = data['grade']
+    student.email = data['email']
     db.session.commit()
     return jsonify(student.to_dict())
 
