@@ -39,7 +39,10 @@ jobs:
         working-directory: .
 
       - name: Run Tests
-        run: make test
+        run: |
+          cd $GITHUB_WORKSPACE
+          pytest
+        #make test
 
       - name: Code Linting
         run: make lint
