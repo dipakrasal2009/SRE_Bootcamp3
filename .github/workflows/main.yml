@@ -36,6 +36,7 @@ jobs:
 
       - name: Build API
         run: make build-api
+        working-directory: .
 
       - name: Run Tests
         run: make test
