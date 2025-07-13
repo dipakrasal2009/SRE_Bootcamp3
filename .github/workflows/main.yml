@@ -38,14 +38,14 @@ jobs:
         run: make build-api
         working-directory: .
 
-      ##- name: Run Tests
-       # run: |
-        #  cd $GITHUB_WORKSPACE
-         # pytest
-        #make test
+      - name: Run Tests
+        run: make test
+          #  cd $GITHUB_WORKSPACE
+          #pytest
+          #make test
 
-          #      - name: Code Linting
-          # run: make lint
+      - name: Code Linting
+        run: make lint
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
