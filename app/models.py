@@ -1,6 +1,6 @@
 from app.db import get_db_connection
 
-def init_db():
+def Student():
     conn = get_db_connection()
     conn.execute('''
         CREATE TABLE IF NOT EXISTS students (
