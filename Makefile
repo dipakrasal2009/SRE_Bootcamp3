@@ -6,7 +6,7 @@ build-api:
 
 test:
 	@echo "Running tests with pytest..."
-	pytest tests/
+	PYTHONPATH=. pytest tests/
 
 lint:
 	@echo "Running code linting with flake8..."
