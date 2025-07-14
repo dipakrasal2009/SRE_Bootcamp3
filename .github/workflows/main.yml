@@ -13,7 +13,7 @@ env:
 
 jobs:
   build-and-push:
-    runs-on: self-hosted  # ✅ GitHub-hosted runner
+    runs-on: ubuntu-latest  # ✅ GitHub-hosted runner
     permissions:
       contents: read
       packages: write
