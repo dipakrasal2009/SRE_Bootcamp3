@@ -1,0 +1,20 @@
+# Core application dependencies
+flask
+flask_sqlalchemy
+
+# If using SQLite specifically (optional, usually included with Python)
+pysqlite3-binary
+
+# For Python-dotenv if using environment variables
+python-dotenv
+
+# Linting
+flake8
+
+# Testing
+pytest
+pytest-flask
+
+# Optional: Migrations (if using Flask-Migrate or Alembic)
+flask-migrate
+psycopg2-binary

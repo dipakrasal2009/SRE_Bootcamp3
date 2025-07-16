@@ -1,21 +1,55 @@
-version: '3.8'
-services:
-  api:
-    build: .
-    ports:
-      - "5000:5000"
-    environment:
-      - DB_PATH=/data/students.db
-    volumes:
-      - ./data:/data
-    depends_on:
-      - migrate
+version: "3.8"
 
-  migrate:
-    image: python:3.10-slim
+services:
+  db:
+    image: postgres:15
+    container_name: db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: app_db
+    ports:
+      - "5432:5432"
     volumes:
-      - ./migrations:/migrations
-      - ./data:/data
-    working_dir: /migrations
-    entrypoint: ["sh", "-c", "apt-get update && apt-get install -y sqlite3 && sqlite3 /data/students.db < init.sql"]
+      - pgdata:/var/lib/postgresql/data
+
+  api1:
+    build: ./app
+    container_name: api1
+    environment:
+      DB_HOST: db
+      DB_USER: user
+      DB_PASSWORD: password
+      DB_NAME: app_db
+    depends_on:
+      - db
+    expose:
+      - "8081"
+
+  api2:
+    build: ./app
+    container_name: api2
+    environment:
+      DB_HOST: db
+      DB_USER: user
+      DB_PASSWORD: password
+      DB_NAME: app_db
+    depends_on:
+      - db
+    expose:
+      - "8081"
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "7070:60"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api1
+      - api2
+
+volumes:
+  pgdata:
 
