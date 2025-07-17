@@ -14,7 +14,7 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   api1:
-    build: ./app
+    image: dipakrasal2009/sre_bootcamp3-api1
     container_name: api1
     environment:
       DB_HOST: db
@@ -27,7 +27,7 @@ services:
       - "8081"
 
   api2:
-    build: ./app
+    image: dipakrasal2009/sre_bootcamp3-api2
     container_name: api2
     environment:
       DB_HOST: db
@@ -40,7 +40,7 @@ services:
       - "8081"
 
   nginx:
-    image: nginx:latest
+    image: dipakrasal2009/nginx:latest
     container_name: nginx
     ports:
       - "7070:60"
