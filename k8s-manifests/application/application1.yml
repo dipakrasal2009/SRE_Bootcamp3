@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: student-api-with-db
+  namespace: student-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: student-api-with-db
+  template:
+    metadata:
+      labels:
+        app: student-api-with-db
+    spec:
+      containers:
+        # ✅ REST API Container
+        - name: rest-api
+          image: dipakrasal2009/sre_bootcamp3-api1:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_HOST
+              value: "localhost"     # Since both containers share the same Pod
+            - name: DB_NAME
+              value: "studentdb"
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: student-db-secret
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: student-db-secret
+                  key: password
+
+        # ✅ Postgres Container
+        - name: postgres
+          image: postgres:15
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: "studentdb"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: student-db-secret
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: student-db-secret
+                  key: password
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+
+      # ✅ Volume for Postgres Data
+      volumes:
+        - name: postgres-data
+          emptyDir: {}
+

@@ -1,0 +1,7 @@
+# vault/eso-vault-sa.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: eso-vault
+  namespace: vault
+
