@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-config
+  namespace: student-api
+data:
+  DATABASE_HOST: postgres
+  DATABASE_PORT: "5432"
+  DATABASE_NAME: studentdb
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: student-api
+  namespace: student-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: student-api
+  template:
+    metadata:
+      labels:
+        app: student-api
+    spec:
+      initContainers:
+        - name: migrate-db
+          image: dipakrasal2009/webserver:latest
+            #command:
+            #[
+            # "python",
+            #  "-c",
+            #  "from app import create_app; from app.db import db; app = create_app(); with app.app_context(): db.create_all()"
+            #]
+          command:
+            - sh
+            - -c
+            - |
+              echo "Testing DB connection..."
+              pg_isready -h postgres -p 5432 -U $POSTGRES_USER
+          envFrom:
+            - configMapRef:
+                name: api-config
+            - secretRef:
+                name: db-credentials
+      containers:
+        - name: flask-api
+          image: dipakrasal2009/webserver:latest
+          ports:
+            - containerPort: 5000
+          envFrom:
+            - configMapRef:
+                name: api-config
+            - secretRef:
+                name: db-credentials
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: student-api
+  namespace: student-api
+spec:
+  type: NodePort  # Or NodePort if you don’t have LB
+  selector:
+    app: student-api
+  ports:
+    - port: 80
+      targetPort: 5000
+
