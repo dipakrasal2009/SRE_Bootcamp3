@@ -25,17 +25,7 @@ spec:
       containers:
         - name: postgres
           image: postgres:15
-          command:
-            - sh
-            - -c
-            - |
-              echo "Testing DB connection..."
-              until pg_isready -h postgres -p 5432 -U $POSTGRES_USER; do
-                echo "Waiting for DB..."
-                sleep 3
-              done
-          ports:
-            - containerPort: 5432
+          # remove custom command! Use default Postgres entrypoint
           env:
             - name: POSTGRES_USER
               valueFrom:
@@ -52,6 +42,8 @@ spec:
                 configMapKeyRef:
                   name: db-config
                   key: POSTGRES_DB
+          ports:
+            - containerPort: 5432
           volumeMounts:
             - name: postgres-storage
               mountPath: /var/lib/postgresql/data

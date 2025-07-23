@@ -26,34 +26,88 @@ spec:
     spec:
       initContainers:
         - name: migrate-db
-          image: dipakrasal2009/webserver:latest
-            #command:
-            #[
-            # "python",
-            #  "-c",
-            #  "from app import create_app; from app.db import db; app = create_app(); with app.app_context(): db.create_all()"
-            #]
+          image: dipakrasal2009/sim-flask-api:latest
           command:
             - sh
             - -c
             - |
               echo "Testing DB connection..."
-              pg_isready -h postgres -p 5432 -U $POSTGRES_USER
-          envFrom:
-            - configMapRef:
-                name: api-config
-            - secretRef:
-                name: db-credentials
+              until pg_isready -h postgres -p 5432 -U $POSTGRES_USER; do
+                echo "waiting for db....";
+                sleep 5;
+              done
+              echo "DB is ready.."
+              #python3 migrate.py
+              #python3 -m app.migrate
+              #python -c "from app import create_app; from app.db import db; app = create_app(); exec('with app.app_context(): db.create_all()')"
+              # python <<EOF
+              #from app import create_app
+#from app.db import db
+#app = create_app()
+#with app.app_context():
+  #db.create_all()
+    #EOF
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: password
+            - name: POSTGRES_DB
+              value: studentdb
+            - name: DATABASE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: api-config
+                  key: DATABASE_HOST
+            - name: DATABASE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: api-config
+                  key: DATABASE_PORT
+            - name: DATABASE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: api-config
+                  key: DATABASE_NAME
       containers:
         - name: flask-api
-          image: dipakrasal2009/webserver:latest
+          image: dipakrasal2009/sim-flask-api:latest
           ports:
-            - containerPort: 5000
-          envFrom:
-            - configMapRef:
-                name: api-config
-            - secretRef:
-                name: db-credentials
+            - containerPort: 5050  # <-- Flask must listen on 0.0.0.0:5050!
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: password
+            - name: POSTGRES_DB
+              value: studentdb
+            - name: DATABASE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: api-config
+                  key: DATABASE_HOST
+            - name: DATABASE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: api-config
+                  key: DATABASE_PORT
+            - name: DATABASE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: api-config
+                  key: DATABASE_NAME
 
 ---
 apiVersion: v1
@@ -62,10 +116,10 @@ metadata:
   name: student-api
   namespace: student-api
 spec:
-  type: NodePort  # Or NodePort if you don’t have LB
+  type: NodePort
   selector:
     app: student-api
   ports:
     - port: 80
-      targetPort: 5000
+      targetPort: 5050  # <-- Must match your flask-api container port!
 
