@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: student-api
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+  namespace: student-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+        - name: my-app-container
+          image: dipakrasal2009/sre_bootcamp3-api1:latest  # Replace with your API image
+          env:
+            - name: DB_HOST
+              value: my-database-service
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: studentdb
+            - name: DB_USER
+              value: user
+            - name: DB_PASSWORD
+              value: password
+          ports:
+            - containerPort: 5000  # Change if your API uses a different port
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app-service
+  namespace: student-api
+spec:
+  selector:
+    app: my-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: NodePort
+
